@@ -14,9 +14,10 @@ class CategoryTest extends TestCase
      * A basic test example.
      */
 
-    public function test_store_category_data(){
+    public function test_store_category_data()
+    {
 
-        $response = $this->post(route('category.store'),[
+        $response = $this->post(route('category.store'), [
             'name' => 'Novel'
         ]);
 
@@ -29,26 +30,28 @@ class CategoryTest extends TestCase
         // $this->assertEquals($category->name,'Novel');
     }
 
-    public function test_update_category_data(){
+    public function test_update_category_data()
+    {
 
         $category = Category::factory()->create();
 
-        $response = $this->post(route('category.update',$category->id),[
+        $response = $this->post(route('category.update', $category->id), [
             'name' => 'novel diary'
         ]);
 
-        $updated_category = Category::where('id',$category->id)->first();
+        $updated_category = Category::where('id', $category->id)->first();
 
         $response->assertRedirect(route('category.index'));
 
-        $this->assertNotEquals($category->name,$updated_category->name);
+        $this->assertNotEquals($category->name, $updated_category->name);
     }
 
-    public function test_delete_category_data(){
+    public function test_delete_category_data()
+    {
 
         $category = Category::factory()->create();
 
-        $response = $this->get(route('category.delete',$category->id));
+        $response = $this->get(route('category.delete', $category->id));
 
         $response->assertRedirect(route('category.index'));
     }
@@ -61,14 +64,19 @@ class CategoryTest extends TestCase
     {
         $categoryMock =  Mockery::mock(Category::class);
 
-        $request = new CategoryRequest([
-            'name' => 'Mystrey',
-        ]);
+        $requestData = [
+            'name' => 'Test Category',
+        ];
 
-        $categoryMock->shouldReceive('create')->once()->andReturn();
+        $mockRequest = Mockery::mock(CategoryRequest::class);
+        $mockRequest->shouldReceive('all')->andReturn($requestData);
 
-        $categoryController = new CategoryController($categoryMock);
-        $response = $categoryController->store($request);
+        $categoryMock->shouldReceive('create')->once()->with($requestData)->andReturn($categoryMock);
+
+        $controller = new CategoryController($categoryMock);
+
+        $response = $controller->store($mockRequest);
+        $this->assertDatabaseHas('categories', ['name' => 'Test Category']);
     }
 
     public function test_update_category_data_using_mockery()
@@ -95,7 +103,7 @@ class CategoryTest extends TestCase
 
         $category = Category::factory()->create();
 
-        $categoryMock->shouldReceive('where')->with('id',$category->id)->once()->andReturnSelf();
+        $categoryMock->shouldReceive('where')->with('id', $category->id)->once()->andReturnSelf();
         $categoryMock->shouldReceive('delete')->once()->andReturn();
 
         $bookController = new CategoryController($categoryMock);
