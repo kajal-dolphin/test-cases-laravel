@@ -10,5 +10,5 @@ class Calculation extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['value1','value2','operation','calculated_percentage','created_at','updated_at','deleted_at'];
+    protected $fillable = ['value1','value2','calculated_percentage','created_at','updated_at','deleted_at'];
 }

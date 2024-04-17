@@ -39,7 +39,6 @@
                         <th>No</th>
                         <th>Value 1</th>
                         <th>Value 2</th>
-                        <th>Operation</th>
                         <th>Calculated Percentage</th>
                         <th>Action</th>
                     </tr>
@@ -50,7 +49,6 @@
                         <td>{{ ++$key }}</td>
                         <td>{{ $calculation->value1 }}</td>
                         <td>{{ $calculation->value2 }}</td>
-                        <td>{{ $calculation->operation }}</td>
                         <td>{{ $calculation->calculated_percentage }}</td>
                         <td>
                             <div class="table-actions d-flex align-items-center gap-3 fs-6">

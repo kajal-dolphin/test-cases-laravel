@@ -24,7 +24,7 @@ class BookFactory extends Factory
         $category_id = Category::all()->random()->id;
 
         return [
-            // 'name' => $faker->name,
+            'name' => $faker->name,
             'description' => $faker->paragraph,
             'category_id' => $category_id,
             'author' => $faker->name,

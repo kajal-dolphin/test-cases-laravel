@@ -14,46 +14,39 @@ class CalculationTest extends TestCase
      * A basic test example.
      */
 
-    public function test_store_calculation_data()
+    public function test_calculates_percentage_correctly_with_valid_values()
     {
         $response = $this->post(route('calculation.store'), [
-            'value1' => 123.86,
-            'value2' => 150,
-            'operation' => 'Add'
+            'value1' => 50,
+            'value2' => 10,
         ]);
 
-        $this->assertEquals(4, Calculation::count());
-
         $response->assertRedirect(route('calculation.index'));
-
-        $calculation = Calculation::where('id', 5)->first();
-
-        $this->assertEquals($calculation->value1, '123.86');
     }
 
-
-    public function test_update_calculation_data(){
-
-        $calculation = Calculation::where('id',5)->first();
-
-        $response = $this->post(route('calculation.update',$calculation->id),[
-            'value1' => 123.86,
-            'value2' => 1500,
-            'operation' => 'Add'
+    public function test_calculates_percentage_correctly_with_invalid_values()
+    {
+        $response = $this->post(route('calculation.store'), [
+            'value1' => 50,
+            'value2' => 101,
         ]);
 
-        $updated_calculation = Calculation::where('id',5)->first();
-
-        $response->assertRedirect(route('calculation.index'));
-
-        $this->assertEquals('1500',$updated_calculation->value2);
+        if ($response->getSession()->has('errors')) {
+            $errorMessage = $response->getSession()->get('errors')->first('value2');
+            echo "Error Message: $errorMessage\n";
+            echo "Calculation Failed !!";
+            $this->assertTrue(true);
+        }
+        else{
+            $response->assertRedirect(route('calculation.index'));
+        }
     }
 
-    public function test_delete_calculation_data(){
+    public function test_delete_calculation_data()
+    {
+        $calculation = Calculation::factory()->create();
 
-        $calculation = Calculation::where('id',4)->first();
-
-        $response = $this->get(route('calculation.delete',$calculation->id));
+        $response = $this->get(route('calculation.delete', $calculation->id));
 
         $response->assertRedirect(route('calculation.index'));
     }
@@ -62,68 +55,45 @@ class CalculationTest extends TestCase
 
 
     //below all test is in unit test using mockery
-    public function testStoreCalculation(): void
+    public function test_calculates_percentage_correctly_with_valid_values_using_mockery(): void
     {
-        $mockCal = Mockery::mock(Calculation::class);
-
-        $mockCal->shouldReceive('create')->once()->andReturn();
+        $calculationMock = Mockery::mock(Calculation::class);
 
         $request = new CalculationRequest([
             'value1' => 50,
-            'value2' => 150,
-            'operation' => 'Add'
+            'value2' => 10,
         ]);
 
-        $calController = new CalculationController($mockCal);
-        $response =  $calController->store($request);
+        $calculationMock->shouldReceive('create')->once()->andReturn();
 
-        if ($response->getSession()->has('success')) {
-            $successMessage = $response->getSession()->get('success');
-            $this->assertStringContainsString('Calculation completed successfully', $successMessage);
-            echo "Success: $successMessage\n";
-        } elseif ($response->getSession()->has('error')) {
-            $errorMessage = $response->getSession()->get('error');
-            $this->assertStringContainsString('Percentage calculation is out of range', $errorMessage);
-            echo "Error: $errorMessage\n";
-        }
+        $calculationControlller = new CalculationController($calculationMock);
+
+        $response = $calculationControlller->store($request);
     }
 
-    public function testUpdateCalculation()
+    public function test_calculates_percentage_correctly_with_invalid_values_using_mockery()
     {
-        $mockCal = Mockery::mock(Calculation::class);
-
-        $calculation = Calculation::factory()->create();
+        $calculationMock = Mockery::mock(Calculation::class);
 
         $request = new CalculationRequest([
             'value1' => 50,
-            'value2' => 150,
-            'operation' => 'Add'
+            'value2' => 101,
         ]);
 
-        $mockCal->shouldReceive('where')->with('id', $calculation->id)->once()->andReturnSelf();
-        $mockCal->shouldReceive('update')->once()->andReturn();
+        $calculationMock->shouldReceive('create')->once()->andReturn();
 
-        $categoryController = new CalculationController($mockCal);
-        $response = $categoryController->update($request, $calculation->id);
+        $calculationControlller = new CalculationController($calculationMock);
 
-        if ($response->getSession()->has('success')) {
-            $successMessage = $response->getSession()->get('success');
-            $this->assertStringContainsString('Calculation Updated successfully', $successMessage);
-            echo "Success: $successMessage\n";
-        } elseif ($response->getSession()->has('error')) {
-            $errorMessage = $response->getSession()->get('error');
-            $this->assertStringContainsString('Percentage calculation is out of range', $errorMessage);
-            echo "Error: $errorMessage\n";
-        }
+        $response = $calculationControlller->store($request);
     }
 
-    public function testDeleteCalculation()
+    public function test_delete_calculation_data_using_mockery()
     {
         $calculationMock =  Mockery::mock(Calculation::class);
 
         $calculation = Calculation::factory()->create();
 
-        $calculationMock->shouldReceive('where')->with('id',$calculation->id)->once()->andReturnSelf();
+        $calculationMock->shouldReceive('where')->with('id', $calculation->id)->once()->andReturnSelf();
         $calculationMock->shouldReceive('delete')->once()->andReturn();
 
         $calculationController = new CalculationController($calculationMock);

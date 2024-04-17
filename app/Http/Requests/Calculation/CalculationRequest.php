@@ -23,8 +23,7 @@ class CalculationRequest extends FormRequest
     {
         return [
             'value1' => 'required|numeric',
-            'value2' => 'required|numeric',
-            'operation' => 'required',
+            'value2' => 'required|numeric|gt:0|lt:100',
         ];
     }
 }

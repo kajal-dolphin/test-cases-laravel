@@ -20,10 +20,14 @@ class CalculationFactory extends Factory
     {
         $faker = \Faker\Factory::create();
 
+        $value1 = $this->faker->randomFloat(2, 0, 1000);
+        $value2 = $this->faker->randomFloat(2, 0, 1000);
+        $calculated_percentage = ($value1 * $value2) / 100;
+
         return [
-            'value1' => $this->faker->randomFloat(2, 0, 1000),
-            'value2' => $this->faker->randomFloat(2, 0, 1000),
-            'operation' => $this->faker->randomElement(['Add' ,'Subtract', 'Multiply','Divide']),
+            'value1' => $value1,
+            'value2' => $value2,
+            'calculated_percentage' => $calculated_percentage
         ];
     }
 }

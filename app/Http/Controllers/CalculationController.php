@@ -28,42 +28,18 @@ class CalculationController extends Controller
 
     public function store(CalculationRequest $request)
     {
-        switch ($request->operation) {
-            case 'Add':
-                $opeation = $request->value1 + $request->value2;
-                $percentage = ($request->value2 / $opeation) * 100;
-                break;
-            case 'Subtract':
-                $opeation = $request->value1 - $request->value2;
-                $percentage = ($request->value2 / $opeation) * 100;
-                break;
-            case 'Multiply':
-                $opeation = $request->value1 * $request->value2;
-                $percentage = ($request->value2 / $opeation) * 100;
-                break;
-            case 'Divide':
-                $opeation = $request->value1 / $request->value2;
-                $percentage = ($request->value2 / $opeation) * 100;
-                break;
-        }
+        $value1 = $request->value1;
+        $value2 = $request->value2;
 
-        $result = intval($percentage);
-        $calPer = number_format($percentage,2);
+        $percentage = ($value1 * $value2) / 100;
 
-        if($result >= 0 && $result <= 100)
-        {
-            $calData = $this->calculation->create([
-                'value1' => $request->value1,
-                'value2' => $request->value2,
-                'operation' => $request->operation,
-                'calculated_percentage' => $calPer
-            ]);
+        $calculation = $this->calculation->create([
+            'value1' => $value1,
+            'value2' => $value2,
+            'calculated_percentage' => $percentage
+        ]);
 
-            return redirect()->route('calculation.index')->with('success','Calculation completed successfully');
-        }
-        else{
-            return redirect()->route('calculation.index')->with('error', 'Percentage calculation is out of range. Please ensure the values result in a percentage between 0% and 100%.');
-        }
+        return redirect()->route('calculation.index')->with('success','Calculation Completed successfully');
     }
 
     public function edit($id)
@@ -74,42 +50,18 @@ class CalculationController extends Controller
 
     public function update(CalculationRequest $request, $id)
     {
-        switch ($request->operation) {
-            case 'Add':
-                $add = $request->value1 + $request->value2;
-                $percentage = ($request->value2 / $add) * 100;
-                break;
-            case 'Subtract':
-                $substract = $request->value1 - $request->value2;
-                $percentage = ($request->value2 / $substract) * 100;
-                break;
-            case 'Multiply':
-                $multiply = $request->value1 * $request->value2;
-                $percentage = ($request->value2 / $multiply) * 100;
-                break;
-            case 'Divide':
-                $divide = $request->value1 / $request->value2;
-                $percentage = ($request->value2 / $divide) * 100;
-                break;
-        }
+        $value1 = $request->value1;
+        $value2 = $request->value2;
 
-        $result = intval($percentage);
-        $calPer = number_format($percentage,2);
+        $percentage = ($value1 * $value2) / 100;
 
-        if($result >= 0 && $result <= 100)
-        {
-            $calData = $this->calculation->where('id',$id)->update([
-                'value1' => $request->value1,
-                'value2' => $request->value2,
-                'operation' => $request->operation,
-                'calculated_percentage' => $calPer
-            ]);
+        $calculation = $this->calculation->where('id',$id)->update([
+            'value1' => $value1,
+            'value2' => $value2,
+            'calculated_percentage' => $percentage
+        ]);
 
-            return redirect()->route('calculation.index')->with('success','Calculation Updated successfully');
-        }
-        else{
-            return redirect()->route('calculation.index')->with('error', 'Percentage calculation is out of range. Please ensure the values result in a percentage between 0% and 100%.');
-        }
+        return redirect()->route('calculation.index')->with('success','Calculation Updated successfully');
     }
 
     public function delete($id)
