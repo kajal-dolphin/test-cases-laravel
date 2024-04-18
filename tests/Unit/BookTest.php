@@ -71,19 +71,22 @@ class BookTest extends TestCase
     {
         $bookMock = Mockery::mock(Book::class);
 
-        $request = new BookRequest([
+        $requestData = [
             'name' => "The Adventures of Huckleberry Finn",
             'description' => "Book description",
             'category_id' => "5",
             'author' => "Mark Twain",
             'price' => "529",
-        ]);
+        ];
 
-        $bookMock->shouldReceive('create')->once()->andReturn();
+        $mockRequest = Mockery::mock(BookRequest::class);
+        $mockRequest->shouldReceive('all')->andReturn($requestData);
+
+        $bookMock->shouldReceive('create')->once()->with($requestData)->andReturn($bookMock);
 
         $bookControlller = new BookContrller($bookMock);
 
-        $response = $bookControlller->store($request);
+        $response = $bookControlller->store($mockRequest);
     }
 
     public function test_update_book_data_using_mockery()
@@ -92,19 +95,22 @@ class BookTest extends TestCase
 
         $book = Book::factory()->create();
 
-        $request = new BookRequest([
-            'name' => "Book Name",
+        $requestData = [
+            'name' => "The Adventures of Huckleberry Finn",
             'description' => "Book description",
-            'category_id' => "Book category_id",
-            'author' => "Book author",
-            'price' => "Book price",
-        ]);
+            'category_id' => "5",
+            'author' => "Mark Twain",
+            'price' => "529",
+        ];
+
+        $mockRequest = Mockery::mock(BookRequest::class);
+        $mockRequest->shouldReceive('all')->andReturn($requestData);
 
         $bookMock->shouldReceive('where')->with('id', $book->id)->once()->andReturnSelf();
-        $bookMock->shouldReceive('update')->once()->andReturn();
+        $bookMock->shouldReceive('update')->once()->with($requestData)->andReturn($bookMock);
 
         $bookControlller = new BookContrller($bookMock);
-        $response = $bookControlller->update($request, $book->id);
+        $response = $bookControlller->update($mockRequest, $book->id);
     }
 
     public function test_delete_book_data_using_mockery()

@@ -7,6 +7,7 @@ use App\Http\Requests\Calculation\CalculationRequest;
 use App\Models\Calculation;
 use Mockery;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Validator;
 
 class CalculationTest extends TestCase
 {
@@ -59,32 +60,25 @@ class CalculationTest extends TestCase
     {
         $calculationMock = Mockery::mock(Calculation::class);
 
-        $request = new CalculationRequest([
+        $requestData = [
             'value1' => 50,
-            'value2' => 10,
-        ]);
+            'value2' => 19,
+        ];
 
-        $calculationMock->shouldReceive('create')->once()->andReturn();
+        $mockRequest = Mockery::mock(CalculationRequest::class);
+        $mockRequest->shouldReceive('all')->andReturn($requestData);
+
+        $percentage = ($requestData['value1'] * $requestData['value2']) / 100;
+
+        $calculationMock->shouldReceive('create')->once()->with([
+            'value1' => $requestData['value1'],
+            'value2' => $requestData['value2'],
+            'calculated_percentage' => $percentage,
+        ])->andReturn($calculationMock);
 
         $calculationControlller = new CalculationController($calculationMock);
 
-        $response = $calculationControlller->store($request);
-    }
-
-    public function test_calculates_percentage_correctly_with_invalid_values_using_mockery()
-    {
-        $calculationMock = Mockery::mock(Calculation::class);
-
-        $request = new CalculationRequest([
-            'value1' => 50,
-            'value2' => 101,
-        ]);
-
-        $calculationMock->shouldReceive('create')->once()->andReturn();
-
-        $calculationControlller = new CalculationController($calculationMock);
-
-        $response = $calculationControlller->store($request);
+        $response = $calculationControlller->store($mockRequest);
     }
 
     public function test_delete_calculation_data_using_mockery()

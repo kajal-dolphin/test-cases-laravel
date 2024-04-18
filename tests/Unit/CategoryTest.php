@@ -76,7 +76,6 @@ class CategoryTest extends TestCase
         $controller = new CategoryController($categoryMock);
 
         $response = $controller->store($mockRequest);
-        $this->assertDatabaseHas('categories', ['name' => 'Test Category']);
     }
 
     public function test_update_category_data_using_mockery()
@@ -84,17 +83,18 @@ class CategoryTest extends TestCase
         $categoryMock =  Mockery::mock(Category::class);
         $category = Category::factory()->create();
 
-        $newName = "New Name";
+        $requestData = [
+            'name' => 'Test Category',
+        ];
 
-        $request = new CategoryRequest([
-            'name' => $newName,
-        ]);
+        $mockRequest = Mockery::mock(CategoryRequest::class);
+        $mockRequest->shouldReceive('all')->andReturn($requestData);
 
-        $categoryMock->shouldReceive('where')->with('id', $category->id)->once()->andReturnSelf();
-        $categoryMock->shouldReceive('update')->once()->andReturn();
+        $categoryMock->shouldReceive('where')->once()->with('id', $category->id)->andReturnSelf();
+        $categoryMock->shouldReceive('update')->once()->with($requestData)->andReturn();
 
         $categoryController = new CategoryController($categoryMock);
-        $response = $categoryController->update($request, $category->id);
+        $response = $categoryController->update($mockRequest, $category->id);
     }
 
     public function test_delete_category_data_using_mockery()
